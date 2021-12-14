@@ -1,0 +1,65 @@
+\documentclass[12pt]{article}
+\usepackage{amsfonts,amsmath}
+\usepackage{float}
+\parindent 0px
+\pagestyle{empty}
+
+\begin{document}
+The distributive property states that $a(b+c)=ab+ac$ for all $a, b, c \in \mathbb{R}$\\[6pt]
+The equivalence class of $a$ is $[a]$.\\[6pt]
+The set $A$ is defined to be $\{1, 2, 3\}$.\\[6pt]
+The movie ticket costs $\$11.50$.\\[6pt]
+$$2 \left(\frac{1}{x^2-1}\right)$$\\[6pt]
+$$2 \left[\frac{1}{x^2-1}\right]$$\\[6pt]
+$$2 \left\{\frac{1}{x^2-1}\right\}$$\\[6pt]
+$$2 \left \langle\frac{1}{x^2-1}\right \rangle$$\\[6pt]
+$$2 \left|\frac{1}{x^2-1}\right|$$\\[6pt]
+$$\left.\frac{dx}{dy}\right|_{x=1}$$
+$$\left(\frac{1}{1+\left(\frac{1}{1+x}\right)}\right)$$
+
+Tables:\\
+
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+$x$&1&2&3&4&5\\\hline
+$f(x)$&11&12&13&14&15\\\hline
+\end{tabular}
+
+\begin{table}[H]
+\centering
+\def\arraystretch{1.5}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+$x$&1&2&3&4&5\\\hline
+$f(x)$&$\frac{1}{2}$&12&13&14&15\\\hline
+\end{tabular}
+\caption{These values represent the function $f(x)$.}
+\end{table}
+
+\begin{table}[H]%H means to put the table where I input.
+\centering
+\caption{The relationship between $f(x)$ and $f'(x)$.}
+\def\arraystretch{1.5}%estretch the table
+\begin{tabular}{|c|p{3in}|}
+\hline
+$f(x)$&$f'(x)$\\\hline
+$x>0$&The function $f(x)$ is increasing. Let's make this sentence longer.\\\hline
+\end{tabular}
+\end{table}
+
+Arrays:
+\begin{align}%need {amsmath} package
+5x^2\,  \text{  Write some explanations.}\\
+5x^2-9=x+3\\
+5x^2-x-12=0
+\end{align}
+
+\begin{align*}% * will stop number the equations
+5x^2-9&=x+3\\
+5x^2-x-12&=0\\
+&=x+12-5x^2
+\end{align*}
+
+
+
+\end{document}

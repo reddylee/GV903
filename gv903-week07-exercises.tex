@@ -1,0 +1,40 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{geometry}
+\geometry{top=3cm, bottom=3cm, left=3cm, right=3cm}
+\usepackage{natbib}
+\usepackage{hyperref}
+
+\title{Week 7 Lab Exercises}
+\author{Philip Leifeld}
+\date{GV903 Advanced Methods -- University of Essex, Department of Government}
+
+\begin{document}
+\maketitle
+
+\noindent Complete the following tasks alone or in groups.
+
+
+\section{Re-implementing OLS}
+
+Re-implement the OLS model using \texttt{R} code.
+
+\begin{enumerate}
+\item Write an estimation function that accepts input data for the dependent variable and for a data frame of independent variables. The function should use OLS to generate coefficients, standard errors, $p$ values, variance--covariance matrix, and $R^2$ and print these results to the console.
+\item Describe and explain the different steps using equations and words.
+\item Apply the function to the \texttt{Prestige} dataset in the \texttt{car} package, just like we did using the \texttt{lm} function on slides 11--16 in Week 5. I.\,e., regress the logarithm of the income on the percentage of women and the average years of education, and show the results to verify that your function returns the same results as the \texttt{lm} function.
+\item Interpret the magnitude and significance of the coefficients substantively, using words and numbers. You do not need to predict anything for this task; you are being asked to explain the results of the model. If you failed to complete the previous tasks successfully, you can use the results from the slides.
+\end{enumerate}
+
+\section{Heteroskedasticity}
+Open the analysis you conducted on the lab session for Week~6 (the health policy debate regression model).
+\begin{enumerate}
+ \item Check graphically and with a hypothesis test whether there is heteroskedasticity, and explain your answer and the result.
+ \item Use heteroskedasticity-consistent standard errors. Does this make a substantive difference?
+ \item Use WLS and FGLS.
+\end{enumerate}
+
+\end{document}

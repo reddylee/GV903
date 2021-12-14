@@ -1,0 +1,94 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{geometry}
+\geometry{top=3cm, bottom=3cm, left=3cm, right=3cm}
+\usepackage{natbib}
+\usepackage{hyperref}
+
+\title{Week 9 Lab Exercises}
+\author{Philip Leifeld}
+\date{GV903 Advanced Methods -- University of Essex, Department of Government}
+
+\begin{document}
+\maketitle
+
+\noindent \citet{towfigh2016direct} conducted an experimental vignette study on the effect of different decision-making bodies on the acceptance of decisions by voters, controlling for voters' personal opinion on the respective topic. To this end, more than 600 individuals in the German state of Rhineland-Palatinate filled out an online survey in March 2011. They answered a number of questions on demographic characteristics, personality traits, and voting preferences and were then presented with three fictitious but realistic decision scenarios in which some decision maker (the Social Democratic Party SPD, the Christian Democratic Union CDU, the majority of parties in the parliament, a referendum, or an expert commission) decided on the introduction of a new policy. Everything else being equal, the type of decision maker was randomly assigned, as was the order of the three scenarios. The first scenario was about phasing out nuclear energy; the second scenario was about introducing a state-wide, centralised final secondary-school exam; and the third scenario was about the introduction of a religious education school subject for Muslims in German. Whether the respective policy was voted for or against in the scenario was also randomised. Thus, the research design consisted of a $5 \times 3 \times 2$ factorial experimental design (decision makers $\times$ scenarios $\times$ positive of negative framing). The results showed that, controlling for personal opinion on the respective topic, voters preferred direct-democratic decisions on issues that were personally important to them while they preferred to delegate decisions to political parties or other representatives with regard to issues of lower importance to them \citep{towfigh2016direct}.
+
+\section*{Variables}
+You will re-analyse this dataset with a new research question, the details of which are provided below. The file \texttt{acceptance.csv} contains the following variables:
+\begin{description}
+ \item[id] The ID of the respondent. Note that each respondent is present in three observations, one for each scenario.
+ \item[scenario] Which decision scenario?
+ \item[decider] Who is making the decision in the respective scenario?
+ \item[acceptance] A composite index of the extent to which the respondent accepts the decision. This variable was generated based on an item battery of a number of relevant questions with high reliability.
+ \item[agreement] To what extent does the respondent personally agree with the decision? This variable was flipped in those instances where the framing of the scenario was negative to ensure coherence.
+ \item[importance] To what extent is the topic of the decision personally important to the respondent?
+ \item[age] Age of the respondent in years.
+ \item[gender] Male or female.
+ \item[duration] How long did it take to complete the survey?
+ \item[trust] A composite variable that captures the extent to which the respondent has trust in society and the state.
+ \item[voter\_influence] Ordinal variable indicating to what extent voters have actual influence, according to the perception of the respondent.
+ \item[big5\_agreeableness] Agreeableness, one of five personality dimensions.
+ \item[big5\_extraversion] Extraversion, one of five personality dimensions.
+ \item[big5\_neuroticism] Neuroticism, one of five personality dimensions.
+ \item[big5\_conscientiousness] Conscientiousness, one of five personality dimensions.
+ \item[big5\_openness] Openness to experience, one of five personality dimensions.
+ \item[date\_time] A date--time character variable indicating when the survey was started.
+ \item[last\_access] A date--time character variable indicating when the survey was submitted.
+ \item[swing\_voter] Does the respondent self-identify as a swing voter?
+ \item[voting\_intention] Voting intention (i.\,e., the party name) in the state election. (The survey was administered shortly before the election.)
+ \item[voting\_pref] Voting preference. The usual party the respondent would most clearly identify with. ``No favoured party'' was a possible answer.
+ \item[voting\_pref\_strength] The strength with which the respondent would identify with the preferred party. \texttt{NA} in cases where no party was identified.
+ \item[one\_party] Does the respondent lean towards a single party?
+\end{description}
+
+\section*{Research question}
+You are interested in the topic of populism. An interesting feature of populism is that populist parties collect ``protest votes'' in the sense that they attract those voters who hold anti-establishment sentiments and who do not accept decisions forced upon them by decision makers.
+
+Test the theory that people who vote for ideologically extreme parties tend not to accept decisions. In other words, explain acceptance by voting preference or voting intention (one at a time), controlling for agreement, importance, age, gender, trust, single-party preference, decider, and perceived influence of voters, in fixed-effects models. Focus specifically on the Left Party as well as the three right-wing parties DVU, REP, and NPD as the four extreme parties with regard to both sides of the ideological spectrum, while keeping the remaining parties in the reference group.
+
+
+\section*{Task 1: Model specification}
+In the first model (\textbf{Model~1}), test whether extreme \emph{voting intention} (left or right, together in a single model term) has a negative effect on acceptance. In other words, your model should have nine independent variables (including eight control variables and possibly leading to more model terms in cases where a variable has multiple categories); the independent variable of interest should capture whether the respective voter intended to vote for one of the extreme parties.
+
+In the second model (\textbf{Model~2}), test whether extreme \emph{party preference} (as an alternative measure of party choice) has a negative effect on acceptance. Like before, capture the extreme parties on the left and right in a single model term.
+
+In the third and fourth model (\textbf{Models~3 and~4}), repeat Models 1 and 2 but with the Left Party only. In \textbf{Models 5 and 6}, repeat Models 1 and 2 but with the parties on the right only.
+
+Each of the six models should have a total of nine independent variables in the model formula and a total of 16 coefficients to be estimated (due to the categorical nature of some independent variables).
+
+The dataset contains a nested structure because there are three observations per individual (i.\,e., one for each scenario), which may possibly lead to clustered errors. Therefore use fixed-effects models with demeaning for all of these specifications. You can use the \texttt{plm} package in \texttt{R} for this purpose.
+
+Show all the necessary \texttt{R} code for your analysis, including any data preparation and regression analyses. Annotate your code with comments.
+
+\section*{Task 2: Results table}
+Present the results in a single well-formatted \texttt{texreg} \LaTeX\ table with the results side-by-side, proper decimal alignment and horizontal rules, renamed coefficients, and a custom table caption. You can find details on the different options of the \texttt{texreg} package in \citet{leifeld2013texreg} and in the package documentation within \texttt{R}. Insert a sentence in your document that cross-references the table.
+
+\section*{Task 3: Interpretation}
+Based on the summary output for Models~1--6, summarise your findings about the extreme party hypothesis substantively, and interpret the effect sizes and significance as necessary to support your substantive interpretation.
+
+\section*{Task 4: Fixed-effects specification}
+Explain what the fixed-effects estimator does in this context, possibly with the use of equations. Explain what specification you used and why. Explain the intuition behind using fixed effects here.
+
+\section*{Task 5: Pooled OLS and random effects}
+Estimate four additional models and show them side-by-side in a regression table as before. The four models should include the same effects as the previous Model~6 from Task~1, but they all should include an additional interaction effect between the respective main effect/hypothesis and the importance of the decision to the respective voter.
+
+The first model (\textbf{Model~7} overall) should be a fixed-effects model like before. The second model (\textbf{Model~8} overall) should be a pooled OLS model. The third model (\textbf{Model~9} overall) should be a random effects model (i.\,e., a random intercept for the different voters). The fourth model (\textbf{Model~10} overall) should be another random effects model; this time, it should contain a random intercept for the voters and a random intercept for the scenarios. You can use the \texttt{lme4} package for some of these models.
+
+\section*{Task 6: Modelling choices}
+Explain each of these four modelling choices and their consequences with regard to the differences between pooled OLS, fixed effects, and the different random-effect specifications. (You can leave out any explanation that was already given in Task~4 with regard to fixed effects). Interpret the variances of the random effects where feasible. Based on the variances for voters and scenarios, which model would you choose and why?
+
+\section*{Task 7: Hausman test}
+Conduct a Hausman test in \texttt{R} to decide whether you should estimate a fixed-effects model (Model~7) or the random-effects model in Model~9. Show the \texttt{R} code and the test result, and interpret the results briefly.
+
+\section*{Task 8: Bib\TeX}
+Inspect the \LaTeX\ code for this set of exercises. Before the end of the document, there are two lines that configure the bibliography. The first one references a file, \verb+literature.bib+, which contains the references for the reference list (also available for download on Moodle). The second one selects a referencing style, in this case \verb+apalike+ for a reference style that resembles the official style of the American Psychological Association (APA). Look at the code and \verb+.bib+ file and learn how to save references in the Bib\TeX\ format. You can export Bib\TeX\ code from Google Scholar and other citation databases and include them in your reference file. To use and format the references, this document loads the \verb+natbib+ package in the preamble. Look at how the package is loaded and look for the \verb+\citet+ and \verb+\citep+ commands in the code to understand how you can reference the citations saved in the Bib\TeX\ file. Look for a few arbitrary papers and books you know from other modules and cite them using \verb+\citet+ and/or \verb+\citep+ in your solution document.
+
+
+\bibliography{literature}
+\bibliographystyle{apalike}
+
+\end{document}

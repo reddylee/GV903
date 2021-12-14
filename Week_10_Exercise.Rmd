@@ -1,0 +1,75 @@
+---
+title: "GV903 Week 10"
+subtitle: "Instrumental Variables"
+author: "Reddy"
+date: "05/12/2021"
+output: html_document
+---
+```{r include=FALSE}
+library(tidyverse)
+library(AER)
+data("CigarettesSW")
+library(texreg)
+```
+
+
+```{r}
+head(CigarettesSW)
+CigarettesSW$rprice <- with(CigarettesSW, price / cpi)# real prices
+CigarettesSW$rincome <- with(CigarettesSW, income / population / cpi)# real income per capita
+CigarettesSW$tdiff <- with(CigarettesSW, (taxs - tax) / cpi)# real state tax relative to everywhere
+m <- ivreg(log(packs) ~ log(rprice) + log(rincome) | log(rincome) +
+tdiff + I(tax / cpi), data = CigarettesSW, subset = year == "1995")
+summary(m)
+# heteroskedasticity-consistent SEs + diagnostics; Inf: z- or chi^2 test
+summary(m, vcov = sandwich, df = Inf, diagnostics = TRUE)
+```
+
+```{r}
+m2 <- ivreg(log(packs) ~ log(rprice) | tdiff, data = CigarettesSW,
+subset = year == "1995")
+anova(m, m2)
+```
+```{r}
+# We can replicate the ivreg results using lm:
+cig <- subset(CigarettesSW, subset = year == "1995")
+s1 <- lm(log(rprice) ~ log(rincome) + tdiff + I(tax / cpi), data = cig)
+cig$pred1 <- predict(s1)
+s2 <- lm(log(packs) ~ pred1 + log(rincome), data = cig)
+screenreg(list(m, s2), single.row = TRUE)
+```
+
+# Exercise
+Crisher (2017) examines the influence of a country's naval power on its likelihood of engaging in international conflict with non-contiguous states. The author employs an instrumental variable probit regression model. The replication data can be found at https://doi.org/10.7910/DVN/ULQCQ6. The dataset has the following variables (where ccode is the country code):
+
+## data.frame
+: 9608 obs. of 15 variables:\
+## $ ccode : num 2 2 2 2 2 2 2 2 2 2 ...\
+## $ year : int 1885 1886 1887 1888 1889 1890 1891 1892 1893 1894 ...\
+## $ energy : num 1.03 1.08 1.23 1.39 1.34 ...\
+## $ polity2 : int 10 10 10 10 10 10 10 10 10 10 ...\
+## $ totton : num 101001 101001 101001 101910 111798 ...\
+## $ landlocked : num 0 0 0 0 0 0 0 0 0 0 ...\
+## $ s_lead : num 0.815 0.815 0.789 0.789 0.789 ...\
+## $ ncmiddum : num 1 0 0 0 1 0 1 0 0 0 ...\
+## $ open : num NA 0.116 0.111 NA 0.12 ...\
+## $ urbprop : num 0.137 0.14 0.143 0.147 0.15 ...\
+## $ ton10 : num 10.1 10.1 10.1 10.2 11.2 ...\
+## $ y_2000 : num 125313 125313 125313 125313 125313 ...\
+## $ ncmidlag : num 0 1 0 0 0 1 0 1 0 0 ...\
+## $ majshipATTsub: num 0 0 0 0 0 0 0 0 0 0 ...\
+## $ MajshipAlt : num 0 0 0 0 0 0 0 0 0 0 ...\
+
+Read the article (it's only six pages including references), and complete the following tasks:
+
+## Task 1. 
+Discuss if the assumptions of instrumental variable regression are met, one assumption and one instrument at a time (two IVs * two assumptions). You may need to speculate a bit about possible other relevant variables.
+
+### Solution: 
+The distance of coastline might not be a good IV since it might have endogeneous problem: the longer the coastline of a country is, the more likely it will encounter conflict. Also, the urban population has no direct correlation with naval power, but the economic strength, which influence both naval power and urban population.
+
+
+## Task 2. 
+Given the data structure and irrespective of the instrumental variable approach, do you think a simple probit model (i. e., a cross-sectional model for binary outcome data) is the most appropriate choice? Discuss any violations of statistical modelling assumptions in the analysis, and discuss possible alternatives or remedies.
+
+### Solution: 

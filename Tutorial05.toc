@@ -1,0 +1,7 @@
+\contentsline {section}{\numberline {1}Linear Functions}{3}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Slop-Intercept form}{3}{subsection.1.1}%
+\contentsline {subsubsection}{\numberline {1.1.1}Example 1}{3}{subsubsection.1.1.1}%
+\contentsline {subsubsection}{\numberline {1.1.2}Example 2}{3}{subsubsection.1.1.2}%
+\contentsline {subsection}{\numberline {1.2}Standard form}{3}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}Point-slop form}{3}{subsection.1.3}%
+\contentsline {section}{\numberline {2}Quadratic Functions}{3}{section.2}%

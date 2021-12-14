@@ -1,0 +1,73 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{geometry}
+\geometry{top=3cm, bottom=3cm, left=2.8cm, right=2.8cm}
+\usepackage{natbib}
+\usepackage{hyperref}
+
+\title{Week 5 Lab Exercises}
+\author{Philip Leifeld}
+\date{GV903 Advanced Methods -- University of Essex, Department of Government}
+
+\begin{document}
+\maketitle
+
+\section{Typesetting and Integration with \texttt{R}}
+
+\begin{enumerate}
+ \item Inspect the \texttt{.tex} source file for the exercises and solutions in all previous weeks, and learn \LaTeX. Install a \LaTeX\ distribution on your computer (e.\,g., Mik\TeX\ or \TeX Live), download a \LaTeX\ editor, and typeset a document with the solutions for this set of exercises in \LaTeX.
+ \item Familiarise yourself with Markdown, \texttt{knitr}, and the way these two functionalities can be used within RStudio to integrate \texttt{R} code within Markdown documents. Typeset your solutions for this Week's exercises in Markdown and make sure you embed some \texttt{R} code into the document.
+ \item Familiarise yourself with \texttt{.Rnw} documents in RStudio. This is a way to embed \texttt{R} code also into \LaTeX\ code and compile the integrated results into a PDF file. Inspect and compile the \texttt{.Rnw} documents from the previous weeks. Also create a solution document for the tasks in this document by integrating \texttt{R} code into your \LaTeX\ document using \texttt{RStudio}, \texttt{knitr}, and a \texttt{.Rnw} document.
+\end{enumerate}
+
+\noindent I can recommend some additional online resources for learning Markdown (\href{https://www.youtube.com/watch?v=2JE66WFpaII}{\#1}, \href{https://www.youtube.com/watch?v=bpdvNwvEeSE}{\#2}), \texttt{knitr} with Markdown (\href{https://www.youtube.com/watch?v=DUAaNVlC6FE}{\#3}, \href{https://www.youtube.com/watch?v=DNS7i2m4sB0}{\#4}), \href{https://www.youtube.com/watch?v=tKUufzpoHDE}{\#5}), \LaTeX\ (\href{https://www.youtube.com/watch?v=cTEfw-jUqAg}{\#6}, \href{https://www.youtube.com/watch?v=Jp0lPj2-DQA}{\#7}, \href{https://www.youtube.com/watch?v=VhmkLrOjLsw}{\#8}), and \texttt{knitr} with \LaTeX\ (\href{https://www.youtube.com/watch?v=LrWBHqN3TUE}{\#9}). I will also post an additional PDF document with details about \LaTeX\ on Moodle.
+
+
+\section{Linear model of pupils' verbal expression}
+Table~\ref{tab:verbal} contains some fictitious observations for 20 different schools. The \texttt{Salary} variable measures how many thousand Pound Sterling in teacher salary are spent per pupil and year. The \texttt{WhiteCollar} variable is the percentage of fathers with white-collar jobs of the pupils in each school. \texttt{SES} measures the average socio-economic status of all pupils in the respective school. \texttt{TeachScore} reports the mean of a verbal test score for all teachers per school. \texttt{MotherEduc} is the mean educational level of the pupils' mothers, where a value of 1 corresponds to two years, 2 corresponds to four years etc. \texttt{VerbalScore} measures the verbal test score of all pupils in the respective school.
+
+\begin{table}[t]
+\centering
+\begin{tabular}{r r r r r r}
+\toprule
+Salary & WhiteCollar & SES & TeachScore & MotherEduc & VerbalScore \\
+\midrule
+3.83   & 28.87  &  7.20  &   26.60   &   6.19 & 37.01 \\
+2.89   & 20.10  &-11.71  &   24.40   &   5.17 & 26.51 \\
+2.86   & 69.05  & 12.32  &   25.70   &   7.04 & 36.51 \\
+2.92   & 65.40  & 14.28  &   25.70   &   7.10 & 40.70 \\
+3.06   & 29.59  &  6.31  &   25.40   &   6.15 & 37.10 \\
+2.07   & 44.82  &  6.16  &   21.60   &   6.41 & 33.90 \\
+2.52   & 77.37  & 12.70  &   24.90   &   6.86 & 41.80 \\
+2.45   & 24.67  & -0.17  &   25.01   &   5.78 & 33.40 \\
+3.13   & 65.01  &  9.85  &   26.60   &   6.51 & 41.01 \\
+2.44   &  9.99  & -0.05  &   28.01   &   5.57 & 37.20 \\
+2.09   & 12.20  &-12.86  &   23.51   &   5.62 & 23.30 \\
+2.52   & 22.55  &  0.92  &   23.60   &   5.34 & 35.20 \\
+2.22   & 14.30  &  4.77  &   24.51   &   5.80 & 34.90 \\
+2.67   & 31.79  & -0.96  &   25.80   &   6.19 & 33.10 \\
+2.71   & 11.60  &-16.04  &   25.20   &   5.62 & 22.70 \\
+3.14   & 68.47  & 10.62  &   25.01   &   6.94 & 39.70 \\
+3.54   & 42.64  &  2.66  &   25.01   &   6.33 & 31.80 \\
+2.52   & 16.70  &-10.99  &   24.80   &   6.01 & 31.70 \\
+2.68   & 86.27  & 15.03  &   25.51   &   7.51 & 43.10 \\
+2.37   & 76.73  & 12.77  &   24.51   &   6.96 & 41.01 \\
+\bottomrule
+\end{tabular}
+\caption{Verbal expression data}
+\label{tab:verbal}
+\end{table}
+
+\begin{enumerate}
+ \item In \texttt{R}, write code to create this data frame without relying on any external files or interactive functions (e.\,g., graphical windows) for data input. Create a scatterplot for the relationship between the average educational level of the mother and the share of white-collar fathers. Show the \texttt{R} code for both, and show the scatterplot.
+ \item Write down the mathematical equation for a linear regression model in which the verbal test score of pupils is regressed on the remaining variables.
+ \item In \texttt{R}, estimate this equation using ordinary least squares. You can use existing functions to do so; no need to re-implement OLS. Interpret the effects of \texttt{Salary}, \texttt{SES}, and \texttt{TeachScore} on \texttt{VerbalScore} in terms of effect size, uncertainty, and significance. Show the regression table using the \texttt{texreg} package.
+ \item Interpret the goodness-of-fit measures (R\textsuperscript{2} and $F$ test) in up to 150 words.
+ \item Show with the empirical data how $R^2$ and the $F$ test are calculated, both using equations in which you insert actual values and \texttt{R} code. You can take the residuals and/or predicted values from the model you estimated before.
+\end{enumerate}
+
+
+\end{document}

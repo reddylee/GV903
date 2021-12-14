@@ -1,0 +1,97 @@
+---
+title: "Week 5 Lab Exercises"
+author: "Zhu Qi"
+date: "01/11/2021"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+# 2 Linear model of pupils' verbal expression
+Table 1 contains some fictitious observations for 20 different schools. The Salary variable
+measures how many thousand Pound Sterling in teacher salary are spent per pupil and
+year. The WhiteCollar variable is the percentage of fathers with white-collar jobs of the
+pupils in each school. SES measures the average socio-economic status of all pupils in the
+respective school. TeachScore reports the mean of a verbal test score for all teachers per
+school. MotherEduc is the mean educational level of the pupils' mothers, where a value of 1
+corresponds to two years, 2 corresponds to four years etc. VerbalScore measures the verbal
+test score of all pupils in the respective school.
+
+## 2.1. 
+  In R, write code to create this data frame without relying on any external files or
+interactive functions (e. g., graphical windows) for data input. Create a scatterplot for
+the relationship between the average educational level of the mother and the share of
+white-collar fathers. Show the R code for both, and show the scatterplot.
+```{r, include=FALSE}
+library(robustbase)
+library(tidyverse)
+```
+
+```{r}
+data1<- coleman
+data1<- rename(data1,Salary=salaryP, WhiteCollar=fatherWc, SES=sstatus, 
+               TeachScore=teacherSc,MotherEduc=motherLev, VerbalScore=Y)
+attach(data1)
+plot(MotherEduc,WhiteCollar, las=1,main="WhiteCollar & MotherEduc")
+plot(WhiteCollar,MotherEduc, las=1,main="MotherEduc & WhiteCollar")
+```
+
+## 2.2
+
+Write down the mathematical equation for a linear regression model in which 
+the verbal test score of pupils is regressed on the remaining variables.
+$$y_{verbal}=\beta_0 + \beta_1*x_{Salary}+\beta_2*x_{WhiteCollar}+\\
+        \beta_3*x_{SES}+\beta_4*x_{TeachScore}+\beta_5*x_{MotherEduc}+u$$
+
+
+## 2.3
+In R, estimate this equation using ordinary least squares. You can use existing
+functions to do so; no need to re-implement OLS. Interpret the effects of Salary,
+SES, and TeachScore on VerbalScore in terms of effeect size, uncertainty, and 
+significance. Show the regression table using the texreg package.
+```{r,include=FALSE}
+library(texreg)
+```
+
+```{r}
+outcome1 <- lm(VerbalScore~Salary+WhiteCollar+SES+TeachScore+MotherEduc)
+summary(outcome1)
+```
+Salary: Ceteris paribus, teacher salary per pupil per year increases 1 thousand 
+        Pound Sterling, the Score of pupil decrease 1.8 on average. 
+        However, the effect is insignificant.
+SES:    Ceteris paribus, the socio-economic status of pupil increase 1 unit, 
+        the Score of pupil increase 0.56 on average, and it is significant.
+TeachS: Ceteris paribus, the mean of a verbal test score for teacher increase
+        1 point, the Score of pupil increase 1.11 on average, and it is significant.
+
+## 2.4. 
+Interpret the goodness-of-fit measures ($R^2$ and F-test) in up to 150 words.
+$R^2$:  is $90.6%$ and Adj $R^2$ is $87.3%$, both are very high, which menas 
+        the model can explaine about $90%$ of the changes of Score of pupil.
+F-test: F-statistic is 27, which is very high, means we can reject the 
+        Null hypothesis that all the 5 parameters equal zero. That is to say, 
+        at least one factor could affect the verbal score of pupils.
+
+## 2.5.
+Show with the empirical data how $R^2$ and the F-test are calculated, both 
+          using equations in which you insert actual values and R code. 
+          You can take the residuals and/or predicted values from the model 
+          you estimated before.
+     
+$$R^2={SSE \over SST}=1-{SSR\over SST}$$
+
+```{r}
+y.hat <- fitted(outcome1)
+u.hat <- residuals(outcome1)
+SST <- sum((VerbalScore-mean(VerbalScore))^2)
+SSE <- sum((y.hat-mean(VerbalScore))^2)
+SSR <- sum((u.hat)^2)
+R1 <- SSE/SST
+R2 <- 1-SSR/SST
+R1
+R2
+```    
+$$R^2={SSE \over SST}=1-{SSR\over SST}=0.9063$$
+
+

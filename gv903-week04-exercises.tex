@@ -1,0 +1,70 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{geometry}
+\geometry{top=3cm, bottom=3cm, left=2.8cm, right=2.8cm}
+\usepackage{natbib}
+\usepackage{hyperref}
+
+\title{Week 4 Lab Exercises}
+\author{Philip Leifeld}
+\date{GV903 Advanced Methods -- University of Essex, Department of Government}
+
+\begin{document}
+\maketitle
+
+\section{Hypothesis Test}
+
+\begin{table}[t]
+\centering
+\begin{tabular}{r r r r r r}
+\toprule
+Salary & WhiteCollar & SES & TeachScore & MotherEduc & VerbalScore \\
+\midrule
+3.83   & 28.87  &  7.20  &   26.60   &   6.19 & 37.01 \\
+2.89   & 20.10  &-11.71  &   24.40   &   5.17 & 26.51 \\
+2.86   & 69.05  & 12.32  &   25.70   &   7.04 & 36.51 \\
+2.92   & 65.40  & 14.28  &   25.70   &   7.10 & 40.70 \\
+3.06   & 29.59  &  6.31  &   25.40   &   6.15 & 37.10 \\
+2.07   & 44.82  &  6.16  &   21.60   &   6.41 & 33.90 \\
+2.52   & 77.37  & 12.70  &   24.90   &   6.86 & 41.80 \\
+2.45   & 24.67  & -0.17  &   25.01   &   5.78 & 33.40 \\
+3.13   & 65.01  &  9.85  &   26.60   &   6.51 & 41.01 \\
+2.44   &  9.99  & -0.05  &   28.01   &   5.57 & 37.20 \\
+2.09   & 12.20  &-12.86  &   23.51   &   5.62 & 23.30 \\
+2.52   & 22.55  &  0.92  &   23.60   &   5.34 & 35.20 \\
+2.22   & 14.30  &  4.77  &   24.51   &   5.80 & 34.90 \\
+2.67   & 31.79  & -0.96  &   25.80   &   6.19 & 33.10 \\
+2.71   & 11.60  &-16.04  &   25.20   &   5.62 & 22.70 \\
+3.14   & 68.47  & 10.62  &   25.01   &   6.94 & 39.70 \\
+3.54   & 42.64  &  2.66  &   25.01   &   6.33 & 31.80 \\
+2.52   & 16.70  &-10.99  &   24.80   &   6.01 & 31.70 \\
+2.68   & 86.27  & 15.03  &   25.51   &   7.51 & 43.10 \\
+2.37   & 76.73  & 12.77  &   24.51   &   6.96 & 41.01 \\
+\bottomrule
+\end{tabular}
+\caption{Verbal expression data}
+\label{tab:verbal}
+\end{table}
+
+In Table~\ref{tab:verbal}, the column \texttt{TeachScore} is the average verbal test score of teachers in 20 randomly selected schools in Britain. The column \texttt{VerbalScore} shows the scores of the same test for the pupils in the respective school.
+
+\begin{enumerate}
+ \item In \texttt{R}, write code to create this data frame without relying on any external files or interactive functions (e.\,g., graphical windows) for data input.
+ \item Test the hypothesis that pupils have a better verbal expression than teachers. Show the calculation steps and results manually (without \texttt{R}). To accomplish this, choose the right distribution, do the hypothesis test, and report an estimate, confidence interval, and $p$-value. Do pupils have a higher verbal test score than teachers?
+ \item Use \texttt{R} to repeat these steps using the \texttt{t.test} function.
+\end{enumerate}
+
+
+\section{Comparing estimators}
+Consider three estimators of the population mean $\mu$:
+\begin{enumerate}
+ \item $\hat{\mu}_1 = n^{-1} \sum_i \lfloor x_i \rfloor$
+ \item $\hat{\mu}_2 = n^{-1} \sum_i \lfloor x_i \rceil$
+ \item $\hat{\mu}_3 = n^{-1} \sum_i x_i^2$
+\end{enumerate}
+Compare these estimators based on three typical criteria for comparing estimators. Which estimator would you choose? Hint: You can draw random numbers from a normal distribution in \texttt{R} as part of your solution to demonstrate your answer graphically or numerically.
+
+\end{document}

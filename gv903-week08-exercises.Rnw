@@ -1,0 +1,37 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{alltt}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,booktabs,geometry,natbib,hyperref}
+\geometry{top=3cm, bottom=3cm, left=3cm, right=3cm,natbib,hyperref}
+\title{Week 8 Lab Exercises}
+\author{Zhu Qi}
+\date{GV903 Advanced Methods -- University of Essex, Department of Government}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+\maketitle
+
+Work through Chapter 3, ``Data visualisation'', of the open-source book ``R for Data Science'' by Hadley Wickham and Garrett Grolemund, published by O'Reilly in 2017. The chapter is available \href{https://r4ds.had.co.nz/data-visualisation.html}{here}. In this chapter, you will learn the basics of \href{https://ggplot2.tidyverse.org/}{\texttt{ggplot2}}, an \texttt{R} package for creating plots that look somewhat nicer than the default graphics in \texttt{R}. Read the chapter and complete the exercises; try to understand the logic of plotting with this package.
+
+It always follows the same pattern: You tell the \texttt{ggplot} command what data to plot (by supplying a data frame and indicating which variable does what), and then you add graphical elements like points, lines and other geometric elements by using additions like \verb|+ geom_point()|, \verb|+ geom_line()| etc. The whole package is quite complex, but it is important to understand the basic logic behind it and get used to working with \texttt{ggplot2}. You can use additional resources like YouTube videos or the many excellent online tutorials and the help pages to understand better how this works. Find the right resource that works best for you to understand the logic of \verb+ggplot2+.
+
+Once you have a basic understanding, download the \verb+.Rnw+ source files of some of the previous lab exercise solutions and re-do the diagrams from these lab sessions using \texttt{ggplot2}. Choose two plots that do not look too complicated but differ a bit in what elements they contain from any of the previous lab sessions and plot the data again using \texttt{ggplot2}.
+
+Prepare to share your solution in the seminar and show your diagram and how you created it using \verb+ggplot2+ in \texttt{RStudio}.
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{ggplot}\hlstd{(}\hlkwc{data} \hlstd{= mpg)} \hlopt{+}
+  \hlkwd{geom_point}\hlstd{(}\hlkwc{mapping} \hlstd{=} \hlkwd{aes}\hlstd{(}\hlkwc{x} \hlstd{= displ,} \hlkwc{y} \hlstd{= hwy))}
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in ggplot(data = mpg): could not find function "{}ggplot"{}}}\end{kframe}
+\end{knitrout}
+<<>>=
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy))
+@
+
+
+\end{document}
+

@@ -1,0 +1,35 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{geometry}
+\geometry{top=3cm, bottom=3cm, left=2.8cm, right=2.8cm}
+\usepackage{natbib}
+\usepackage{hyperref}
+
+\title{Week 3 Lab Exercises}
+\author{Philip Leifeld}
+\date{GV903 Advanced Methods -- University of Essex, Department of Government}
+
+\begin{document}
+\maketitle
+
+In the \emph{Democratic Republic of Deliberation}, members of the parliament take turns at speaking in front of the other legislators. Some of the speeches are longer than others, and on average there is enough time for twelve speakers on each day on which the parliament convenes.
+
+A legislation period lasts for five years. In each year, there are four sessions of three calendar months. In each session, there are exactly 60 days on which the parliament convenes.
+
+At the end of each three-month session, the President of the Parliament recounts on how many days there were unusually many or unusually few speeches. The President counts a day as unusual if the number of speeches was not within two standard deviations of its expectation.
+
+If it turns out that an unusually high number of days was characterised by an unusual number of speeches, the President of the Parliament reprimands the legislators in a public act. This is only an act of symbolic politics to appease the electorate and has no further bearing on any future deliberations in the parliament. ``Unusual'' is defined as being larger than two standard deviations of what one could expect given the knowledge of the daily average of speeches.
+
+\begin{enumerate}
+ \item How many speeches should the electorate expect within a session and within a legislation period, respectively?
+ \item What is the probability that there is an unusual number of speeches on any given day?
+ \item What is the probability that there is an unusual number of unusual days in a given session?
+ \item What is the probability that the electorate will see the President of the parliament reprimand the legislators at least once per year?
+ \item What is the probability that the electorate will not see a single public act of this kind during a legislation period?
+\end{enumerate}
+Show the manual solutions (not the \texttt{R} code).
+
+\end{document}

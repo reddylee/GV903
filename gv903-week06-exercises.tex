@@ -1,0 +1,41 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{geometry}
+\geometry{top=3cm, bottom=3cm, left=2.8cm, right=2.8cm}
+\usepackage{natbib}
+\usepackage{hyperref}
+
+\title{Week 6 Lab Exercises}
+\author{Philip Leifeld}
+\date{GV903 Advanced Methods -- University of Essex, Department of Government}
+
+\begin{document}
+\maketitle
+
+\noindent Use RStudio with either \LaTeX\ or Markdown and \texttt{knitr} to write up your answers for the following tasks, and embed your \texttt{R} code in the text document.
+
+\section*{Background: Two health policy debates in the UK}
+\citet{fergie2019mapping}, \citet{buckton2019discourse}, and \citet{hilton2020policy} conducted a content analysis of two contentious policy debates in the health sector. They first analysed the policy debate on minimum-unit pricing for alcohol (MUP), which was implemented in Scotland in May 2018 \citep{fergie2019mapping}. Then they analysed the debate on the soft drinks industry levy (SDIL), informally known as the ``sugar tax'', which was implemented UK-wide in April 2018 \citep{buckton2019discourse}. Finally, they compared both policy debates \citep{hilton2020policy}. Their approach was to hand-code the statements of political actors about various arguments and policy beliefs in national newspapers. There are 237 policy actors, who revealed their positions on a number of arguments related to the two policies.
+
+\section*{Ideological positions of actors and cross-issue advocacy}
+In a new research paper, the same authors now want to analyse the determinants of the ideological positions of the 237 actors. They apply a Bayesian item--response theory (IRT) model, which generates estimates of the ideological ideal point of each actor on a latent underlying ideological dimension along with a highest-posterior density (HPD) interval, which is roughly the Bayesian equivalent of a 95\,\% confidence interval. For example, if an actor has an estimated ideal point of $-0.87$, we can derive that the actor is quite far in the pro-regulation camp, while for example a value of $1.04$ would be a rather strong anti-regulation position. A value around zero would mean a neutral or ambiguous ideological position with regard to the two policies. You do not need to worry about how the ideal points were computed; focus instead on how these ideal points can be explained. The question is now what determines where an actor stands on this ideological scale, as measured by the IRT model. Your task is to estimate and interpret a regression model for this purpose.
+
+\section*{The dataset and tasks}
+The dataset \texttt{healthscaling.csv} contains the names, ideological positions, the lower and upper bounds of the HPD interval, dummy variables for whether an actor is active in the SDIL debate and in the MUP debate, respectively, the number of statements the actor makes in each of the two policy debates, and the actor type. With these data, complete the following tasks:
+
+\begin{enumerate}
+ \item Create a variable for the width of the HPD interval of the estimate and add it to the dataset. It expresses the extent to which an actor expresses a vague ideological position. You can call it ``spread''.
+ \item Estimate a linear regression model in \texttt{R} to explain the ideological position of actors. Explain the ideological position of actors using the spread of expressed policy beliefs, the type of actor, the overall frequency with which an actor is active (in both policy debates combined), and an indicator of whether an actor is active in both debates. We can suspect that actors who tend towards the extreme left or right end of the ideological scale may have wider HPD intervals because extreme actors may not be inclined to hold or express moderate beliefs and there are few very extreme beliefs. That is, we expect a non-linear, U-shaped effect of spread. Therefore you need to include a second-order polynomial effect for the spread variable to capture this non-linear relationship. Create the necessary new variables and add them to the dataset; estimate a linear model in \texttt{R}; report the results using a regression table with the \texttt{texreg} package; and show the code for these steps in your answer, along with a brief explanation of what you did.
+ \item Interpret the effects: Which actor types clearly tend towards the pro-regulation camp? Which actor types tend towards the anti-regulation camp? For which actor types can we not be sure? Where are European Union actors on the ideological scale? What else can we learn from the model about cross-policy involvement, actors' activity, and their vagueness of stated beliefs? Interpret the non-linear relationship by looking at the polynomial coefficients.
+ \item Evaluate the goodness of fit of the model using the $F$ test and $R^2$ statistic reported under the linear model. What do these numbers tell us? Also calculate the $R^2$ statistic step by step in \texttt{R} and show the relevant equations with inserted values (where possible and where it does not take up whole pages) in your answer.
+ \item Use the \texttt{predict} and \texttt{plot} functions in \texttt{R} to interpret the functional form of the relationship between the spread/vagueness of actors' policy beliefs and their ideological position, keeping all other variables constant at typical or average values. Feel free to show either a single average scenario or multiple ``typical'' scenarios, and describe/interpret the effect graphically.
+ \item Re-compute the predictions manually, including confidence and prediction intervals.
+\end{enumerate}
+
+\bibliography{gv903-week06-exercises}
+\bibliographystyle{apalike}
+
+\end{document}

@@ -1,0 +1,38 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{geometry}
+\geometry{top=3cm, bottom=3cm, left=3cm, right=3cm}
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+\title{Week 11 Lab Exercises}
+\author{Philip Leifeld}
+\date{GV903 Advanced Methods -- University of Essex, Department of Government}
+
+\begin{document}
+\maketitle
+
+Load the analyses you conducted in the lab in Week 9 using the populism dataset (\verb+acceptance.csv+). The following exercises are based on these data and models.
+
+\section{Visualisation of results}
+Create a grouped boxplot with the \texttt{ggplot2} package in \texttt{R}. It should have one panel or facet for each scenario. In each panel or facet, there should be three boxes, one for left, one for centre, and one for right parties. The nine boxes overall should show the level of acceptance of decisions as a function of party type, grouped by scenario.
+
+\section{Marginal effects}
+Create two separate subsets of the data: one for the central exam decision scenario and one for the religious education decision scenario. For each of the two subsets of the data, regress acceptance of the decision on agreement, importance, decider, right-wing party preference, voter influence, age, and an interaction effect between age and personal agreement with the decision. You can use a linear model. For each of the two models, create a marginal-effects plot for the interaction between age and agreement. You can use the \texttt{interplot} package for this purpose. Show the \texttt{R} code, model output, and diagram, and explain what you find in the diagrams, in conjunction with the model output.
+
+\section{Prediction}
+In the following diagram, you can see the predicted acceptance of the nuclear energy phasing-out decision as a function of the perceived importance of the decision. The linear model used here was estimated using OLS based on a subset of the data for the nuclear energy scenario. The linear model regressed acceptance on personal agreement, decider, importance, right-wing party preference (for DVU, REP, or NPD), and an interaction effect between importance and right-wing party preference.
+
+The predictions are based on holding personal agreement constant at its mean and assuming that the decider was the Social Democratic Party SPD.
+\begin{center}
+ \includegraphics[width=0.6\textwidth]{pred-crop}
+\end{center}
+The black line shows this predicted relationship for non-right-wing voters. The red line shows this predicted relationship for voters of NPD, REP, or DVU. You can see that right-wing voters' acceptance of decisions decreases more strongly with increasing importance than other voters' acceptance. In other words, acceptance of decisions goes down if people perceive an issue as personally important, but that declining effect is stronger for right-wing voters. The dashed lines represent the 95\,\% confidence intervals around the predicted lines.
+
+Explain what those confidence intervals mean and how we can interpret the interval prediction substantively, taking into account the two different interval predictions. Then re-create this analysis and plot in \texttt{R}, possibly with the help of the \texttt{predict} function. Use \texttt{R}'s basic plotting functions in the first instance to create the plot exactly as shown. Then create another version of the plot using \texttt{ggplot2}.
+
+\end{document}

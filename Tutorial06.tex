@@ -1,0 +1,57 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage[margin=2cm]{geometry}
+\usepackage{amsfonts, amssymb, amsmath}
+\usepackage{tikz, pgfplots}
+\usepackage{graphicx}
+%\usepackage{float}
+
+\def \eq1{y=\dfrac{x}{3x^2+x+1}}
+\newcommand{\set}[1]{\setlength\itemsep{#1em}}
+
+\newcommand\calculator{\tikz{
+	\node (c)[inner sep=0pt, draw, fill=black,
+	anchor=south west]{\phantom{n}};
+	\begin{scope}[x=(c.south east),y=(c.north west)]
+	\fill [white](.1,.7) rectangle(.9,.9);
+	\foreach \x in {.1,.33,.55,.79}{
+	\foreach \y in {.1,.24,.38,.53}{
+	\fill [white](\x, \y)rectangle+(.11,.07);}}
+	\end{scope} }}
+	\def\calcicon#1{\noindent#1 \calculator\ }
+	
+\begin{document}
+
+\textbf{Critical Thinking Questions}\\
+
+\begin{figure}[h]%h for here, t for top, b for bottom
+\centering
+\caption{Essex}
+\vspace{0.5cm}
+\includegraphics[width=3cm,height=2cm]{logo_Essex}
+%\includegraphics[scale=2]{logo_Essex}
+\caption{Essex}
+\end{figure}
+
+\begin{enumerate}
+
+\set{1.2}
+\item \calculator\ Let's examine the function: $\eq1$.
+
+\item this is the symble for the set of all real numbers: $\mathbb{R}$
+
+\item this is the symble for the set of all integers: $\mathbb{Z}$
+
+\item this is the symble for the set of all rationals: $\mathbb{Q}$
+
+\item Interpret the effects: Which actor types clearly tend towards the pro-regulation camp?
+Which actor types tend towards the anti-regulation camp? For which actor types can
+we not be sure? Where are European Union actors on the ideological scale? What
+else can we learn from the model about cross-policy involvement, actors' activity, and
+their vagueness of stated beliefs? Interpret the non-linear relationship by looking at
+the polynomial coefficients.\\
+
+\item Healthy group (International Health Bodies, NHS/Professional Associations and Health Advocacy Groups) clearly tend towards the pro-regulation camp. \\
+Retailers and their Associations and Manufacturers tend towards the anti-regulation camp. \\
+
+\end{enumerate}
+\end{document}
