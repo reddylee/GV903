@@ -1,0 +1,32 @@
+---
+title: "GV903 Week 11"
+subtitle: "Maxmium Likelihood Estimation"
+author: "Reddy"
+date: "14/12/2021"
+output: html_document
+---
+
+```{r include=FALSE}
+library(tidyverse)
+library(texreg)
+```
+
+# 1.
+
+## Binomial likelihood function with y heads, n trials, probability:
+
+$$L(\pi|n,y)=\pi ^y(1-\pi)^{(n-y)}$$\
+
+## Corresponding log likelihood: 
+
+$$\log L(\pi|n,y)=y· \log (pi)+(n-y)· \log (1-\pi)$$
+
+## Write this as an R function:
+
+```{r}
+binomial.loglikelihood<-function (prob,
+y,n){
+  loglikelihood<-y*log (prob) +(n-y)   *log (1-prob)
+  return (loglikelihood)
+}
+```
