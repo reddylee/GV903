@@ -9,19 +9,21 @@ output: html_document
 ```{r include=FALSE}
 library(tidyverse)
 library(texreg)
+library(fastDummies)
+library(interplot)
 ```
 
 # 1.
 
-## Binomial likelihood function with y heads, n trials, probability:
+## 1.1. Binomial likelihood function with y heads, n trials, probability:
 
 $$L(\pi|n,y)=\pi ^y(1-\pi)^{(n-y)}$$\
 
-## Corresponding log likelihood: 
+## 1.2. Corresponding log likelihood: 
 
 $$\log L(\pi|n,y)=y· \log (pi)+(n-y)· \log (1-\pi)$$
 
-## Write this as an R function:
+## 1.3. Write this as an R function:
 
 ```{r}
 binomial.loglikelihood<-function (prob,
@@ -29,4 +31,83 @@ y,n){
   loglikelihood<-y*log (prob) +(n-y)   *log (1-prob)
   return (loglikelihood)
 }
+```
+
+## 1.4. Use the opt im function to optimize the likelihood given fixed y, n:
+
+```{r}
+test<-optim(c(.5),# starting value for prob
+binomial.loglikelihood,#the log-likelihood function
+method="BFGS",#optimization method
+hessian=TRUE,# return numerical Hessian
+control=list (fnscale=-1),# maximize instead of minimize
+y=43, n=100)# the data
+print (test)
+```
+## We can now proceed to compute the standard error(s):
+```{r}
+sqrt(diag(solve(-test$hessian)))
+```
+## Only one parameter. It's easy to plot the likelihood function:
+```{r}
+ruler<-seq(0,1,0.01)
+loglikelihood<- binomial.loglikelihood (ruler, y=43,n=100)
+plot (ruler, loglikelihood, type="l",lwd=2, col="blue",
+xlab=expression (pi), ylab="Log-Likelihood", ylim=c(-300, -70) ,main="Log-Likelihood for Binomial Model")
+abline(v=.43)
+```
+
+# Week 11 Lab Exercises
+Load the analyses you conducted in the lab in Week 9 using the populism dataset (acceptance.csv). The following exercises are based on these data and models.
+
+
+## Task 1: Visualisation of results
+Create a grouped boxplot with the `ggplot2` package in `R`. It should have one panel or facet for each scenario. In each panel or facet, there should be three boxes, one for left, one for centre, and one for right parties. The nine boxes overall should show the level of acceptance of decisions as a function of party type, grouped by scenario.
+```{r}
+acceptance <- read.csv("acceptance.csv")
+head(acceptance)
+acceptance %>%
+  mutate(party=voting_pref)%>% 
+  mutate(party=ifelse(party=="Left Party","Left Party",
+               ifelse(party=="DVU/REP/NPD","Right Party","Center"))) %>%   
+  ggplot(aes(party,acceptance))+
+  geom_boxplot(aes(color=party))+
+  facet_wrap(~scenario)+
+  theme_bw()
+```
+```{r}
+acceptance <- read.csv("acceptance.csv")
+head(acceptance)
+acceptance %>%
+  mutate(party=voting_pref)%>% 
+  mutate(party=ifelse(party=="Left Party","Left Party",
+               ifelse(party=="DVU/REP/NPD","Right Party","Center"))) %>%   
+  ggplot(aes(party,acceptance,fill=party))+
+  geom_boxplot()+
+  facet_wrap(~scenario)+
+  theme_bw()
+```
+
+## Task 2:Marginal effects
+Create two separate subsets of the data: one for the central exam decision scenario and one for the religious education decision scenario. For each of the two subsets of the data, regress acceptance of the decision on agreement, importance, decider, right-wing party preference, voter influence, age, and an interaction effect between age and personal agreement with the decision. You can use a linear model. For each of the two models, create a marginal-effects plot for the interaction between age and agreement. You can use the `interplot` package for this purpose. Show the `R` code, model output, and diagram, and explain what you find in the diagrams, in conjunction with the model output.
+### Central Exam
+```{r}
+sub_exam <- acceptance %>% 
+  filter(scenario=="central_exam") %>% 
+  mutate(right_pref=ifelse(voting_pref=="DVU/REP/NPD",1,0))  
+exam <- lm(acceptance~agreement + importance + decider +
+    right_pref + voter_influence + age*agreement,sub_exam)
+summary(exam)
+interplot(exam, var2 = "age", var1 = "agreement")
+```
+
+### religious_education
+```{r}
+sub_educ <- acceptance %>% 
+  filter(scenario=="religious_education") %>% 
+  mutate(right_pref=ifelse(voting_pref=="DVU/REP/NPD",1,0))  
+educ <- lm(acceptance~agreement + importance + decider +
+    right_pref + voter_influence + age*agreement,sub_educ)
+summary(educ)
+interplot(educ, var2 = "age", var1 = "agreement")
 ```
