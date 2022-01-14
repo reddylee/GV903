@@ -1,0 +1,13 @@
+---
+title: "Logit and Probit Model"
+author: "Reddy Lee"
+date: "14/01/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F,message = F)
+library(foreign)
+data <- read.dta("2011 Scottish")
+```
+

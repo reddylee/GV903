@@ -1,0 +1,201 @@
+---
+title: "GV903_Week_16"
+author: "Reddy Lee"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+        toc: TRUE
+        toc_float:
+          toc_collapsed: true
+        toc_depth: 5
+        theme: readable
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,message = F,warning = F)
+library(kableExtra)
+```
+
+# 1. American National Election Survey: Voting for Obama
+```{r}
+ANES <- read.csv("../week_16/dataset-anes-2012-subset1.csv")
+str(ANES)
+```
+
+```{r}
+model <- glm(vote_obama ~ ft_dem + ft_rep + black + hispanic + other + income, family = binomial, data = ANES)
+summary(model)
+```
+
+# 2. Logit and Probit in Comparison
+```{r}
+Y <- seq(-5, 5, 0.05)
+plot(Y, 1 / (1 + exp(-Y)), type = "l", xlab = "Y",
+ylab = "F(Y)")
+lines(Y, pnorm(Y), lty = "dashed")
+legend(-5, 1, legend = c("Logit", "Probit"), lty = 1:2)
+```
+
+# 3. Likelihood Maximisation in R
+## 3.1. Code up the (negative) log-likelihood function
+
+```{r}
+negLL <- function(b, X, y) {
+  theta <- 1 / (1 + exp(-X %*% b))
+  ll <- sum(y * log(theta) + (1 - y) * log(1 - theta))
+  return(-ll)
+}
+```
+
+## 3.2. Prepare the design matrix, DV, and start values:
+```{r}
+myX <- cbind(1, ANES$ft_dem, ANES$ft_rep, ANES$black,
+  ANES$hispanic, ANES$other, ANES$income)
+myY <- ANES$vote_obama
+startval <- rep(0, ncol(myX))
+```
+
+## 3.3. optimise the function given the data:
+```{r}
+results <- optim(startval, negLL, hessian = TRUE,
+method = "BFGS", X = myX, y = myY)
+```
+
+## 3.4. Extract parameters and SEs (via diagonal of VCOV matrix):
+```{r}
+data.frame(coef = results$par,
+  SE = sqrt(diag(solve(results$hessian))))
+```
+## 3.5. Extract the log likelihood:
+```{r}
+results$value
+```
+## 3.6. Compute AIC (recap: AIC = -2 $\logL$ + 2k):
+```{r}
+2 * results$value + 2 * ncol(myX) # (not -2 because negLL)
+```
+```{r}
+summary(model)
+```
+
+# 4. Logit model again, now specifying logit link function explicitly:
+## 4.1. Logit model
+```{r}
+model <- glm(vote_obama ~ ft_dem + ft_rep + black +
+  hispanic + other + income,
+  family = binomial(link = logit), data = ANES)
+```
+## 4.2. Probit model
+```{r}
+model2 <- glm(vote_obama ~ ft_dem + ft_rep + black +
+hispanic + other + income,
+family = binomial(link = probit), data = ANES)
+```
+
+## 4.3. Logit and Probit Comparison
+```{r}
+library(texreg)
+texreg(list(model, model2), single.row = TRUE, dcolumn = TRUE,booktabs = TRUE, use.packages = FALSE, table = FALSE,
+custom.model.names = c("Logit", "Probit"))
+```
+## 4.3. Coefficient Plots in texreg
+```{r}
+plotreg(model)
+```
+# 5. Interpretation of Logit Coefficients
+```{r}
+exp(coef(model))
+```
+# 6. Predicted Probabilities for Logit Models
+## 6.1. 
+```{r}
+newdata <- data.frame(ft_dem = mean(ANES$ft_dem, na.rm = TRUE),ft_rep = mean(ANES$ft_rep, na.rm = TRUE),
+  black = 0,
+  hispanic = 0,
+  other = 0,
+  income = mean(ANES$income, na.rm = TRUE))
+newdata
+```
+## 6.2. create four scenarios for the
+di erent ethnicities:
+```{r}
+newdata <- newdata[rep(1, 4), ]
+newdata$black[2] <- 1
+newdata$hispanic[3] <- 1
+newdata$other[4] <- 1
+rownames(newdata) <- c("white", "black", "hispanic", "other")
+newdata
+```
+
+## 6.3. First, predict the log odds:
+```{r}
+logodds <- predict(model, newdata = newdata)
+logodds
+```
+## 6.4. Next, let's predict probabilities:
+```{r}
+prob <- predict(model, newdata = newdata, type = "response")
+prob
+```
+## 6.5. convert the log odds to probabilities manually via the logit transformation:
+```{r}
+exp(logodds) / (1 + exp(logodds))
+```
+# 7. Confidence Intervals for the Predictions
+```{r}
+pred <- predict(model, newdata = newdata, type = "response",
+se.fit = TRUE)
+crit <- qnorm(1 - (0.05 / 2))
+crit
+data.frame(prediction = pred$fit,
+upper_ci = pred$fit + crit * pred$se.fit,
+lower_ci = pred$fit - crit * pred$se.fit)
+```
+# 8. Predictions for the Democratic Feeling Thermometer
+## 8.1. Create scenarios with varying thermometer levels and all other
+variables  xed at their means, then predict:
+```{r}
+dtherm <- seq(from = min(ANES$ft_dem), to = max(ANES$ft_dem),
+length.out = 100)
+newdata <- data.frame(ft_dem = dtherm,
+ft_rep = mean(ANES$ft_rep, na.rm = TRUE),
+black = mean(ANES$black, na.rm = TRUE),
+hispanic = mean(ANES$hispanic, na.rm = TRUE),
+other = mean(ANES$other, na.rm = TRUE),
+income = mean(ANES$income, na.rm = TRUE))
+tail(newdata)
+pred <- predict(model, newdata = newdata, type = "response",
+se.fit = TRUE)
+```
+## 8.2. Plot the predicted probabilities with a 95 per cent CI:
+```{r}
+plot(newdata$ft_dem, pred$fit, type = "l")
+lines(newdata$ft_dem, pred$fit + crit * pred$se.fit,
+lty = "dashed")
+lines(newdata$ft_dem, pred$fit - crit * pred$se.fit,
+lty = "dashed")
+```
+
+## 8.3. Create thermometer scenarios conditional on ethnicities:
+```{r}
+newdata$black <- 0
+newdata$hispanic <- 0
+newdata$other <- 0
+newdata$white <- 1
+pred2 <- predict(model, newdata = newdata, type = "response",
+se.fit = TRUE)
+newdata$black <- 1
+newdata$white <- 0
+pred3 <- predict(model, newdata = newdata, type = "response",se.fit = TRUE)
+plot(newdata$ft_dem, pred2$fit, type = "l", col = "red")
+lines(newdata$ft_dem, pred2$fit + crit * pred2$se.fit,
+lty = "dashed", col = "red")
+lines(newdata$ft_dem, pred2$fit - crit * pred2$se.fit,
+lty = "dashed", col = "red")
+lines(newdata$ft_dem, pred3$fit, type = "l", col = "blue")
+lines(newdata$ft_dem, pred3$fit + crit * pred3$se.fit,
+lty = "dashed", col = "blue")
+lines(newdata$ft_dem, pred3$fit - crit * pred3$se.fit,
+lty = "dashed", col = "blue")
+```
+
