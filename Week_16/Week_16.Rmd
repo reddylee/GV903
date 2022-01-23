@@ -198,4 +198,29 @@ lty = "dashed", col = "blue")
 lines(newdata$ft_dem, pred3$fit - crit * pred3$se.fit,
 lty = "dashed", col = "blue")
 ```
+# 9. Model fit
+## 9.1. Separation Plots
+```{r}
+library(separationplot)
+separationplot(pred = model$fitted.values,
+actual = model$y,line = TRUE,newplot = FALSE)
+```
+## 9.2. Receiver Operating Characteristics (ROC)
+```{r}
+library(ModelGood)
+model3 <- glm(vote_obama ~ ft_rep + black + hispanic +
+other + income, family = binomial,
+data = ANES) # leaving out ft_dem
+plot(Roc(model))
+lines(Roc(model3), col = "red")
+```
+## 9.3. Area Under the Curve (AUC)
+### 9.3.1. The area under the curve is an overall measure of model fit.
+```{r}
+Roc(model)
+```
+### 9.3.2. We can also use this to compare models:
+```{r}
+Roc(model)$Auc$glm$Auc - Roc(model3)$Auc$glm$Auc
+```
 

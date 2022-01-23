@@ -1,0 +1,31 @@
+---
+title: 'GV903: Week 17'
+author: "Reddy Lee"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,warning = F,message = F)
+library(tidyverse)
+```
+
+# 1. maximum likelihood
+## 1.1 RCode Example 1.1:Assembling the data
+```{r}
+#pop-density,CO2-emissions,GDP-pcPPP
+library(WDI) # library for retrieving WDI data
+wdi<-WDI(country="all",indicator=c("EN.POP.DNST","EN.ATM.CO2E.KT","NY.GDP.PCAP.PP.CD"),start=2012,end=2012,extra=T,cache =NULL)
+wdi<-subset(wdi,region!="Aggregates") #removing country aggregates
+wdi<-na.omit(wdi) # Omit cases with NA;
+names(wdi)[4:6]<- c("pop.den","co2.kt","gdp.pc.ppp","wb.code")
+attach ( wdi )
+```
+
+## 1.2. RCode Example 1.2 Step 1:Set up data matrices
+```{r}
+x.mat<-cbind(1,log(gdp.pc.ppp))#note the column of 1s
+y.vec<-log(co2.kt)
+view(wdi)
+```
+
