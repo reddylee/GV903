@@ -2,30 +2,232 @@
 title: 'GV903: Week 17'
 author: "Reddy Lee"
 date: "`r Sys.Date()`"
-output: html_document
+output: 
+  html_document:
+        toc: TRUE
+        toc_float:
+          toc_collapsed: true
+        toc_depth: 5
+        theme: readable
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE,warning = F,message = F)
+library(MASS)
 library(tidyverse)
+library(foreign)
+library(nlme)
+library(WDI)
+library(ProfileLikelihood)
+library(dslabs)
+library(stringr)
 ```
 
 # 1. maximum likelihood
-## 1.1 RCode Example 1.1:Assembling the data
+
+## Figure
+###Figure 1.1
 ```{r}
-#pop-density,CO2-emissions,GDP-pcPPP
-library(WDI) # library for retrieving WDI data
-wdi<-WDI(country="all",indicator=c("EN.POP.DNST","EN.ATM.CO2E.KT","NY.GDP.PCAP.PP.CD"),start=2012,end=2012,extra=T,cache =NULL)
-wdi<-subset(wdi,region!="Aggregates") #removing country aggregates
-wdi<-na.omit(wdi) # Omit cases with NA;
-names(wdi)[4:6]<- c("pop.den","co2.kt","gdp.pc.ppp","wb.code")
-attach ( wdi )
+pi.hat <- seq(0,1,.001)
+f.y <- pi.hat^2*(1-pi.hat)^1
+plot(pi.hat,f.y,type="l",bty="l",ylab="",lwd=3,xlab=substitute(hat(theta)),las=1)
+segments(.67, 0.0, x1 = .67, y1 = .148,
+         col = "grey30",  lwd = 2)
+segments(.62, .149, x1 = .72, y1 = .149,
+         col = "grey30", lty = par("lty"), lwd = 2)         
+#dev.off()
 ```
 
-## 1.2. RCode Example 1.2 Step 1:Set up data matrices
+### Figure 1.2
 ```{r}
-x.mat<-cbind(1,log(gdp.pc.ppp))#note the column of 1s
-y.vec<-log(co2.kt)
-view(wdi)
+n<-10000         # population size
+mu<-10           # population mean
+sigma<-1         # population standard error
+samplesize<-10   # sample size 
+nsamples<-1000   # number of samples to collect
+pop<-rnorm(n,mu,sigma)
+smpls<-NULL
+for (i in 1:nsamples) {
+  smpls[i]<-mean(sample(pop,samplesize,replace=T))
+}
+truehist(smpls,nbins=19,col="slategray3",las=1,yaxt="n",ylab="",xlab="",ann=FALSE,xlim=(c(9,11)))
+abline(a=NULL,b=NULL,v=10,col="gray10",lwd=4,xaxt="n")
+#dev.off()
 ```
+
+### Figure 1.3 
+
+## Get Data from WDI api via R
+```{r}
+wdi<-WDI(country = "all",
+indicator = c("EN.POP.DNST", #popdensity
+    "EN.ATM.CO2E.KT", #c02 emissions
+     "NY.GDP.PCAP.PP.CD"), #GDPpcPPP
+   start = 2012, end = 2012, extra = TRUE, cache = NULL)
+wdi<-na.omit(subset(wdi, region !="Aggregates"))
+names(wdi)[4:6]<-c("pop.den", "co2.kt","gdp.pc.ppp" )
+out<-lm(log(co2.kt) ~ log(gdp.pc.ppp), data=wdi)
+out2<-glm(log(co2.kt) ~ log(gdp.pc.ppp) + pop.den, data=wdi)
+anova(out,out2, test="LRT")
+attach(wdi)
+```
+```{r}
+plot(log(gdp.pc.ppp ), log(co2.kt ), pch=19,
+     xlab="2012 GDP per capita at PPP, log $US",
+     ylab="2012 CO2 emissions, log Ktons",bty="l",
+      las=1)
+abline(reg=out,lwd=3)
+arrows(x1=log(wdi[wdi$iso3c=="USA","gdp.pc.ppp"]),
+       y1=fitted(out)[rownames(out$model)[which(wdi$iso3c=="USA")]],
+       x0=log(wdi[wdi$iso3c=="USA","gdp.pc.ppp"]),
+       y0=log(wdi[wdi$iso3c=="USA","co2.kt"]),
+       col="black", length=0.1, angle=20,
+       lwd=2.5)
+points(log(wdi[wdi$iso3c=="USA","gdp.pc.ppp"]), 
+       log(wdi[wdi$iso3c=="USA","co2.kt"]),
+       #col= "blue",#grey(0.5),
+       pch = 19,
+       cex= 3)
+#dev.off()
+```
+
+### Figure 1.4 
+
+## Profile likelihood
+```{r}
+wdi$lgdppc<-log(wdi$gdp.pc.ppp)
+xx <- profilelike.lm(formula = log(co2.kt)~1, data=wdi, profile.theta="lgdppc",
+lo.theta=0.94, hi.theta=1.14, length=500)
+```
+```{r}
+with(xx, 
+  plot(theta,profile.lik,las=1,lty=1,lwd=3,
+    type="l",pch=19,xlab=substitute(beta[1]),
+    ylab="likelihood",yaxt="n",bty="l",main="Least Squares as MLE",
+    xlim=c(0.95,1.15))
+  )
+# abline(v=coef(fit.lm)[2],col="gray50",lwd=3)
+abline(h=max(xx$profile.lik),col="gray50",lwd=4)
+#dev.off()
+```
+
+## Using R to Maximize the Likelihood
+### Set up matrices.
+```{r}
+x <- cbind(1,as.matrix(log(wdi$gdp.pc.ppp)))    # note the column of 1s
+y <- as.matrix(log(wdi$co2.kt))
+K <- ncol(x); n <- nrow(x)# number of cases (n) and variables (k)
+```
+### Define the likelihood function.
+```{r}
+loglik.my <- function(par,X,Y) {               
+  Y <- as.vector(y)
+  X <- as.matrix(x)
+  xbeta <- X%*%par[1:K]
+  sigma <- sqrt(sum(((X[,2]-mean(X[,2]))^2)/(n-K)))*
+    sum(-(1/2)*log(2*pi)-(1/2)*log(sigma^2)-(1/(2*sigma^2))*(y-xbeta)^2)
+}
+```
+### Pass the likelihood fn to an optimizer.
+```{r}
+mle.fit <- optim(c(5,5),loglik.my, method = "BFGS", control = 
+            list(trace=TRUE,maxit=10000,fnscale = -1),hessian = TRUE)    
+if(mle.fit$convergence!=0) 
+  print("MDW WARNING: Convergence Problems; Try again!")
+```
+### Calculate standard diagnostics.
+```{r}
+stderrors<- -sqrt(diag(-solve(mle.fit$hessian)))
+z<-mle.fit$par/stderrors
+p.z <- 2* (1 - pnorm(abs(z)))
+out.table <- cbind(mle.fit$par,stderrors,z,p.z)
+out.table
+out.table <- data.frame ( Est=mle.fit$par , SE=stderrors , Z=z , pval=p.z )
+round (out.table , 2 )
+```
+
+# 2. Bootstrapping Illustration in R
+```{r}
+set.seed(123) # set a random seed for reproducibility
+n <- 20
+S <- rnorm(n = n, mean = 5.5, sd = 1.4) # generate some values
+S
+sd(S) # the empirical SD is slightly off due to small n
+B <- matrix(0, nrow = 1000, ncol = n)
+for(i in 1:1000) {# resample 1000 times
+  B[i, ] <- sample(S, size = n, replace = TRUE)
+}
+B[1:2, ] # let's look at some of the resampled values
+sd_B <- apply(B, 1, sd) # compute SD for each row
+sd_hat <- mean(sd_B) # compute mean SD across samples
+sd_hat # again, slightly off due to small n
+hist(sd_B) # inspect the distribution of the SDs
+```
+## The SE of any sample statistic is the SD of the sampling distribution for that statistic.
+
+```{r}
+SE <- sd(sd_B)
+SE
+
+CI_lower <- sd_hat - qnorm(1 - (0.05 / 2)) * SE
+CI_upper <- sd_hat + qnorm(1 - (0.05 / 2)) * SE
+cat(sd_hat, " [", CI_lower, "; ", CI_upper, "]", sep = "")
+```
+## Or, if we cannot assume a normal distribution, we can just use the quantiles from the empirical sampling distribution:
+```{r}
+quantile(sd_B, 0.025)
+
+quantile(sd_B, 0.975)
+```
+# 3. Other Resampling Approaches
+## Permutation Tests
+### Let's  rst create some data for this experiment:
+```{r}
+set.seed(123)
+dat <- data.frame(group = c(rep("t", 10),
+  rep("c", 10)),
+  mark = c(rnorm(10, 69, 10),
+  rnorm(10, 57, 10)))
+head(dat)
+```
+
+### Now let's compute the di erence and the t test:
+```{r}
+obs <- mean(dat$mark[dat$group == "t"]) -
+mean(dat$mark[dat$group == "c"])
+obs
+
+t.test(dat$mark[dat$group == "t"], dat$mark[dat$group == "c"])
+```
+
+```{r}
+d <- numeric(1000)
+for (i in 1:1000) {
+  dat2 <- dat
+  dat2$group<-sample(dat2$group,replace=FALSE)
+  d[i] <- mean(dat2$mark[dat2$group == "t"]) -
+    mean(dat2$mark[dat2$group == "c"])
+}
+hist(d)
+abline(v = quantile(d, 0.95), col = "blue", lwd = 3)
+abline(v = obs, col = "red", lwd = 3)
+```
+# 4. Exercises
+## 4.1. Permutation test
+Use the murders dataset from the `dslabs' R package to check whether and how the total
+number of murders (on a log scale) differs between the regions West and South. To do so,
+use a permutation test that you implement specifically for this purpose. Briefly explain
+your approach and describe your findings. Use a suitable statistical test to verify that
+your approach produces sensible results, and describe the comparison.
+### Hypothesis:
+H0: There is no difference. 
+H1: Significant difference.
+```{r}
+dat <- murders%>% 
+  mutate(log_total= log(total)) %>% 
+  dplyr::select(region, log_total) %>% 
+  filter(grepl("North",region)) %>% 
+  view()
+```
+
 

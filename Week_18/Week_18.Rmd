@@ -1,0 +1,140 @@
+---
+title: "GV903: Week 18"
+author: "Reddy Lee"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: yes
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,message = F,warning = F)
+library(tidyverse)
+library(MASS)
+library(texreg)
+```
+
+# 1. Lecture
+## 1.1. Ordinal Logit and Probit model
+$$
+P\left(\tau_{1}<r \leq \tau_{2}\right)=\int_{-\infty}^{\tau_{2}} f(r) d r-\int_{-\infty}^{\tau_{1}} f(r) d r=F\left(\tau_{2}\right)-F\left(\tau_{1}\right)
+$$
+```{r}
+pnorm(-3,1.75) 
+pnorm(1.4,1.75)-pnorm(-3,1.75)  
+pnorm(6.3,1.75)-pnorm(1.4,1.75)  
+1-pnorm(6.3,1.75) 
+```
+### 1.1.1. Visual Representation of these Results
+```{r}
+x <- seq(-5, 8, length.out = 100)
+plot(x, dnorm(x, 1.75), type = "l")
+abline(v = -3, col = "red")
+abline(v = 1.4, col = "blue")
+abline(v = 6.3, col = "green")
+```
+### 1.1.2. shifting the distribution center at 0
+$$
+\begin{gathered}
+P\left(y_{i}=1 \mid \mathbf{x}_{i}\right)=P\left(\tau_{0} \leq \mathbf{x}_{i}^{\top} \boldsymbol{\beta}+\epsilon_{i}<\tau_{1} \mid \mathbf{x}_{i}\right) \\
+\Leftrightarrow P\left(y_{i}=1 \mid \mathbf{x}_{i}\right)=P\left(\tau_{0}-\mathbf{x}_{i}^{\top} \boldsymbol{\beta} \leq \epsilon_{i}<\tau_{1}-\mathbf{x}_{i}^{\top} \boldsymbol{\beta} \mid \mathbf{x}_{i}\right)
+\end{gathered}
+$$
+```{r}
+x <- seq(-5 - 1.75, 8 - 1.75, length.out = 100)
+plot(x, dnorm(x, 1.75 - 1.75), type = "l")
+abline(v = -3 - 1.75, col = "red")
+abline(v = 1.4 - 1.75, col = "blue")
+abline(v = 6.3 - 1.75, col = "green")
+```
+## 1.2. Ordered Probit: Individual Probabilities
+Probability of observation i to belong into interval m:
+$$
+P\left(y_{i}=m\right)= \begin{cases}\Phi\left(\tau_{1}-\mathbf{x}_{i}^{\top} \boldsymbol{\beta}\right) & \text { for } m: \text { first level } \\ \Phi\left(\tau_{2}-\mathbf{x}_{i}^{\top} \boldsymbol{\beta}\right)-\Phi\left(\tau_{1}-\mathbf{x}_{i}^{\top} \boldsymbol{\beta}\right) & \text { for } m: \text { second level } \\ \cdots & \text { for } m: \text { third etc level } \\ 1-\Phi\left(\tau_{M}-\mathbf{x}_{i}^{\top} \boldsymbol{\beta}\right) & \text { for } m: \text { last level }\end{cases}
+$$
+$$
+\Phi(\epsilon)=\int_{-\infty}^{\epsilon} \frac{1}{\sqrt{2 \pi}} \exp \left\{-\frac{r^{2}}{2}\right\} d r
+$$
+## 1.3. Ordered Logit: Individual Probabilities
+Probability of observation i to belong into interval m:
+$$
+P\left(y_{i}=m\right)= \begin{cases}\Lambda\left(\tau_{1}-\mathbf{x}_{i}^{\top} \boldsymbol{\beta}\right) & \text { for } m: \text { first level } \\ \Lambda\left(\tau_{2}-\mathbf{x}_{i}^{\top} \boldsymbol{\beta}\right)-\Lambda\left(\tau_{1}-\mathbf{x}_{i}^{\top} \boldsymbol{\beta}\right) & \text { for } m: \text { second level } \\ \cdots & \text { for } m: \text { third etc level } \\ 1-\Lambda\left(\tau_{M}-\mathbf{x}_{i}^{\top} \boldsymbol{\beta}\right) & \text { for } m: \text { last level }\end{cases}
+$$
+$$
+\Lambda(\epsilon)=\frac{\exp \{\epsilon\}}{1+\exp \{\epsilon\}}
+$$
+
+## 1.4. Likelihood Function
+the individual probabilities per observation are:
+$$
+P\left(y_{i}=m \mid \mathbf{x}_{i}, \boldsymbol{\beta}, \boldsymbol{\tau}\right)=F\left(\tau_{m}-\mathbf{x}_{i}^{\top} \boldsymbol{\beta}\right)-F\left(\tau_{m-1}-\mathbf{x}_{i}^{\top} \boldsymbol{\beta}\right)
+$$
+the joint probability for all observations i...n and all intervals m...M:
+$$
+\mathcal{L}(\boldsymbol{\beta}, \boldsymbol{\tau} \mid \mathbf{y}, \mathbf{X})=\prod_{m=1}^{M} \prod_{y_{i}=m}\left[F\left(\tau_{m}-\mathbf{x}_{i}^{\top} \boldsymbol{\beta}\right)-F\left(\tau_{m-1}-\mathbf{x}_{i}^{\top} \boldsymbol{\beta}\right)\right]
+$$
+### 1.4.1. Corresponding log likelihood:
+$$
+\log \mathcal{L}(\boldsymbol{\beta}, \boldsymbol{\tau} \mid \mathbf{y}, \mathbf{X})=\sum_{m=1}^{M} \sum_{y_{i}=m} \log \left[F\left(\tau_{m}-\mathbf{x}_{i}^{\top} \boldsymbol{\beta}\right)-F\left(\tau_{m-1}-\mathbf{x}_{i}^{\top} \boldsymbol{\beta}\right)\right]
+$$
+
+# 2. Ordered Logit and Probit in R
+
+## 2.1. World Values Survey: Poverty
+
+```{r}
+library(carData)
+model1 <- polr(poverty ~ religion + degree + country +age + gender, data = WVS, method = "logistic",Hess = TRUE)
+model2 <- polr(poverty ~ religion + degree + country +age + gender, data = WVS, method = "probit",Hess = TRUE)
+class(model1)
+WVS$poverty_ols <- as.numeric(WVS$poverty)
+head(WVS$poverty_ols)
+model3 <- glm(poverty_ols ~ religion + degree +
+  country + age + gender, data = WVS)
+summary(model1)
+screenreg(list(model1,model2,model3), single.row = TRUE)
+```
+# 3. The Parallel Regression Assumption
+## 3.1. Separate Logit Models
+```{r}
+WVS_a <- WVS
+WVS_a$poverty_ols[WVS_a$poverty_ols == 1] <- 0
+WVS_a$poverty_ols[WVS_a$poverty_ols %in% 2:3] <- 1
+WVS_b <- WVS
+WVS_b$poverty_ols[WVS_b$poverty_ols %in% 1:2] <- 0
+WVS_b$poverty_ols[WVS_b$poverty_ols == 3] <- 1
+a <- glm(poverty_ols ~ religion + degree + country +
+age + gender, data = WVS_a,
+family = binomial(link = "logit"))
+b <- glm(poverty_ols ~ religion + degree + country +
+age + gender, data = WVS_b,
+family = binomial(link = "logit"))
+screenreg(list(a, b), single.row = TRUE)
+```
+## 3.2. Brant Test in R
+```{r}
+library(brant)
+brant(model1)
+```
+## 3.3. Cumulative Link Models (CLM) in R
+```{r}
+library(ordinal)
+model4 <- clm(poverty ~ religion + degree + country +age + gender, data = WVS, link = "logit")
+summary(model4)
+```
+## 3.4. re-specify country as a variable that has a nominal e ect:
+```{r}
+model5 <- clm(poverty ~ religion + degree + age +
+gender, nominal = ~ country, data = WVS,
+link = "logit")
+summary(model5)
+```
+## 3.5. Assessing the Parallel Regression Assumption with CLMs
+```{r}
+anova(model4, model5)
+```
+
+
+
+
